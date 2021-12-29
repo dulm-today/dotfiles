@@ -12,6 +12,9 @@ YELLOW=$(tput setaf 3)
 BLUE=$(tput setaf 4)
 RESET=$(tput sgr0)
 
+MODULES="tmux"
+MODULES_INSTALL=""
+
 echo_info()
 {
     echo "${BLUE}INFO : $@ ${RESET}"
@@ -60,6 +63,21 @@ install_file()
     ln -vs "$CURDIR/$1" "${HOME}/.$1"
 }
 
+add_module()
+{
+    echo "$MODULES" | grep "$1" || echo_err "Unknown module $1"
+    echo "$MODULES_INSTALL" | grep "$1" || MODULES_INSTALL="$MODULES_INSTALL $1"
+}
+
+list_modules()
+{
+    echo "Support modules:"
+    for mod in $MODULES
+    do
+        echo "  $mod"
+    done
+}
+
 install_tmux()
 {
     if [ -e '${HOME}/.tmux/plugins/tpm' ]; then
@@ -72,9 +90,10 @@ install_tmux()
 usage()
 {
     cat <<EOF
-Usage: $0 [ options ]
+Usage: $0 [ options ] [ modules... ]
     -f, --force        Force install, replace the exist files.
     -h, --help         Show this messages.
+    -l, --list         List modules.
 EOF
 }
 
@@ -84,15 +103,28 @@ do
         -f|--force)
             FORCE=1
             ;;
+        -l|--list)
+            list_modules
+            exit 0
+            ;;
         -h|--help)
             usage
             exit 0
             ;;
         *)
-            echo "Error: invalid argument $1"
-            exit 1
+            add_module $1
             ;;
     esac
 done
 
-install_tmux
+if [ -z "$MODULES_INSTALL" ]; then
+    MODULES_INSTALL="$MODULES"
+fi
+
+for mod in ${MODULES_INSTALL}
+do
+    echo_info "Install $mod ..."
+    eval "install_$mod"
+done
+
+echo_info "All finish!"
