@@ -60,7 +60,7 @@ install_file()
     fi
 
     mkdir -vp "$(dirname "${HOME}/.$1")"
-    ln -vs "$CURDIR/$1" "${HOME}/.$1"
+    cp -vsf "$CURDIR/$1" "${HOME}/.$1"
 }
 
 add_module()
@@ -115,6 +115,7 @@ do
             add_module $1
             ;;
     esac
+    shift
 done
 
 if [ -z "$MODULES_INSTALL" ]; then
