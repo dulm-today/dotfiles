@@ -80,7 +80,7 @@ list_modules()
 
 install_tmux()
 {
-    if [ -e '${HOME}/.tmux/plugins/tpm' ]; then
+    if [ ! -e '${HOME}/.tmux/plugins/tpm' ]; then
         git clone --depth 1 https://github.com/tmux-plugins/tpm ${HOME}/.tmux/plugins/tpm
     fi
 
